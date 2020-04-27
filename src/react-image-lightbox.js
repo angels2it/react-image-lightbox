@@ -60,7 +60,14 @@ class ReactImageLightbox extends Component {
   }
 
   // Request to transition to the previous image
-  static getTransform({ x = 0, y = 0, zoom = 1, width, targetWidth, rotate = 0 }) {
+  static getTransform({
+    x = 0,
+    y = 0,
+    zoom = 1,
+    width,
+    targetWidth,
+    rotate = 0,
+  }) {
     let nextX = x;
     const windowWidth = getWindowWidth();
     if (width > windowWidth) {
@@ -111,6 +118,7 @@ class ReactImageLightbox extends Component {
     this.outerEl = React.createRef();
     this.zoomInBtn = React.createRef();
     this.zoomOutBtn = React.createRef();
+    this.rotateBtn = React.createRef();
     this.caption = React.createRef();
 
     this.closeIfClickInner = this.closeIfClickInner.bind(this);
@@ -129,6 +137,7 @@ class ReactImageLightbox extends Component {
     this.handleWindowResize = this.handleWindowResize.bind(this);
     this.handleZoomInButtonClick = this.handleZoomInButtonClick.bind(this);
     this.handleZoomOutButtonClick = this.handleZoomOutButtonClick.bind(this);
+    this.handleRotateButtonClick = this.handleRotateButtonClick.bind(this);
     this.requestClose = this.requestClose.bind(this);
     this.requestMoveNext = this.requestMoveNext.bind(this);
     this.requestMovePrev = this.requestMovePrev.bind(this);
@@ -565,7 +574,7 @@ class ReactImageLightbox extends Component {
     const currentTime = new Date();
     if (
       currentTime.getTime() - this.lastKeyDownTime <
-      this.props.keyRepeatLimit &&
+        this.props.keyRepeatLimit &&
       keyCode !== KEYS.ESC
     ) {
       return;
@@ -1077,7 +1086,7 @@ class ReactImageLightbox extends Component {
   }
 
   handleRotateButtonClick() {
-    if(!this.props.enableRotate) {
+    if (!this.props.enableRotate) {
       return;
     }
     const { rotate = 0 } = this.state;
@@ -1294,7 +1303,7 @@ class ReactImageLightbox extends Component {
       offsetY,
       isClosing,
       loadErrorStatus,
-      rotate = 0
+      rotate = 0,
     } = this.state;
 
     const boxSize = this.getLightboxRect();
@@ -1328,7 +1337,7 @@ class ReactImageLightbox extends Component {
         ...ReactImageLightbox.getTransform({
           ...transforms,
           ...bestImageInfo,
-          rotate
+          rotate,
         }),
       };
 
@@ -1478,7 +1487,7 @@ class ReactImageLightbox extends Component {
           // Floating modal with closing animations
           className={`ril-outer ril__outer ril__outerAnimating ${
             this.props.wrapperClassName
-            } ${isClosing ? 'ril-closing ril__outerClosing' : ''}`}
+          } ${isClosing ? 'ril-closing ril__outerClosing' : ''}`}
           style={{
             transition: `opacity ${animationDuration}ms`,
             animationDuration: `${animationDuration}ms`,
@@ -1611,14 +1620,9 @@ class ReactImageLightbox extends Component {
                       'ril__toolbarItemChild',
                       'ril__builtinButton',
                       'ril__zoomInButton',
-                      ...(zoomLevel === MAX_ZOOM_LEVEL
-                        ? ['ril__builtinButtonDisabled']
-                        : []),
                     ].join(' ')}
                     ref={this.rotateBtn}
-                    disabled={
-                      this.isAnimating()
-                    }
+                    disabled={this.isAnimating()}
                     onClick={
                       !this.isAnimating()
                         ? this.handleRotateButtonClick
@@ -1823,11 +1827,11 @@ ReactImageLightbox.defaultProps = {
   nextLabel: 'Next image',
   nextSrc: null,
   nextSrcThumbnail: null,
-  onAfterOpen: () => { },
-  onImageLoadError: () => { },
-  onImageLoad: () => { },
-  onMoveNextRequest: () => { },
-  onMovePrevRequest: () => { },
+  onAfterOpen: () => {},
+  onImageLoadError: () => {},
+  onImageLoad: () => {},
+  onMoveNextRequest: () => {},
+  onMovePrevRequest: () => {},
   prevLabel: 'Previous image',
   prevSrc: null,
   prevSrcThumbnail: null,
