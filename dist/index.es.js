@@ -429,6 +429,7 @@ var ReactImageLightbox =
       _this.outerEl = React.createRef();
       _this.zoomInBtn = React.createRef();
       _this.zoomOutBtn = React.createRef();
+      _this.rotateBtn = React.createRef();
       _this.caption = React.createRef();
       _this.closeIfClickInner = _this.closeIfClickInner.bind(
         _assertThisInitialized(_this)
@@ -476,6 +477,9 @@ var ReactImageLightbox =
         _assertThisInitialized(_this)
       );
       _this.handleZoomOutButtonClick = _this.handleZoomOutButtonClick.bind(
+        _assertThisInitialized(_this)
+      );
+      _this.handleRotateButtonClick = _this.handleRotateButtonClick.bind(
         _assertThisInitialized(_this)
       );
       _this.requestClose = _this.requestClose.bind(
@@ -1627,10 +1631,6 @@ var ReactImageLightbox =
       {
         key: 'handleRotateButtonClick',
         value: function handleRotateButtonClick() {
-          if (!this.props.enableRotate) {
-            return;
-          }
-
           var _this$state$rotate = this.state.rotate,
             rotate = _this$state$rotate === void 0 ? 0 : _this$state$rotate;
           this.setState({
@@ -2310,16 +2310,8 @@ var ReactImageLightbox =
                           'ril-zoom-in',
                           'ril__toolbarItemChild',
                           'ril__builtinButton',
-                          'ril__zoomInButton',
-                        ]
-                          .concat(
-                            _toConsumableArray(
-                              zoomLevel === MAX_ZOOM_LEVEL
-                                ? ['ril__builtinButtonDisabled']
-                                : []
-                            )
-                          )
-                          .join(' '),
+                          'ril__rotateButton',
+                        ].join(' '),
                         ref: this.rotateBtn,
                         disabled: this.isAnimating(),
                         onClick: !this.isAnimating()

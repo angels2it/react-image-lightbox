@@ -1086,9 +1086,6 @@ class ReactImageLightbox extends Component {
   }
 
   handleRotateButtonClick() {
-    if (!this.props.enableRotate) {
-      return;
-    }
     const { rotate = 0 } = this.state;
     this.setState({ rotate: rotate + 90 });
   }
@@ -1619,7 +1616,7 @@ class ReactImageLightbox extends Component {
                       'ril-zoom-in',
                       'ril__toolbarItemChild',
                       'ril__builtinButton',
-                      'ril__zoomInButton',
+                      'ril__rotateButton',
                     ].join(' ')}
                     ref={this.rotateBtn}
                     disabled={this.isAnimating()}
