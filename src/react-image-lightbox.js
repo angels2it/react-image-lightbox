@@ -60,7 +60,7 @@ class ReactImageLightbox extends Component {
   }
 
   // Request to transition to the previous image
-  static getTransform({ x = 0, y = 0, zoom = 1, width, targetWidth }) {
+  static getTransform({ x = 0, y = 0, zoom = 1, width, targetWidth, rotate = 0 }) {
     let nextX = x;
     const windowWidth = getWindowWidth();
     if (width > windowWidth) {
@@ -69,7 +69,7 @@ class ReactImageLightbox extends Component {
     const scaleFactor = zoom * (targetWidth / width);
 
     return {
-      transform: `translate3d(${nextX}px,${y}px,0) scale3d(${scaleFactor},${scaleFactor},1)`,
+      transform: `translate3d(${nextX}px,${y}px,0) scale3d(${scaleFactor},${scaleFactor},1) rotate(${rotate}deg)`,
     };
   }
 
@@ -565,7 +565,7 @@ class ReactImageLightbox extends Component {
     const currentTime = new Date();
     if (
       currentTime.getTime() - this.lastKeyDownTime <
-        this.props.keyRepeatLimit &&
+      this.props.keyRepeatLimit &&
       keyCode !== KEYS.ESC
     ) {
       return;
@@ -1076,6 +1076,14 @@ class ReactImageLightbox extends Component {
     }
   }
 
+  handleRotateButtonClick() {
+    if(!this.props.enableRotate) {
+      return;
+    }
+    const { rotate = 0 } = this.state;
+    this.setState({ rotate: rotate + 90 });
+  }
+
   handleZoomOutButtonClick() {
     const nextZoomLevel = this.state.zoomLevel - ZOOM_BUTTON_INCREMENT_SIZE;
     this.changeZoom(nextZoomLevel);
@@ -1270,6 +1278,7 @@ class ReactImageLightbox extends Component {
       clickOutsideToClose,
       discourageDownloads,
       enableZoom,
+      enableRotate,
       imageTitle,
       nextSrc,
       prevSrc,
@@ -1285,6 +1294,7 @@ class ReactImageLightbox extends Component {
       offsetY,
       isClosing,
       loadErrorStatus,
+      rotate = 0
     } = this.state;
 
     const boxSize = this.getLightboxRect();
@@ -1318,6 +1328,7 @@ class ReactImageLightbox extends Component {
         ...ReactImageLightbox.getTransform({
           ...transforms,
           ...bestImageInfo,
+          rotate
         }),
       };
 
@@ -1467,7 +1478,7 @@ class ReactImageLightbox extends Component {
           // Floating modal with closing animations
           className={`ril-outer ril__outer ril__outerAnimating ${
             this.props.wrapperClassName
-          } ${isClosing ? 'ril-closing ril__outerClosing' : ''}`}
+            } ${isClosing ? 'ril-closing ril__outerClosing' : ''}`}
           style={{
             transition: `opacity ${animationDuration}ms`,
             animationDuration: `${animationDuration}ms`,
@@ -1583,6 +1594,34 @@ class ReactImageLightbox extends Component {
                     onClick={
                       !this.isAnimating() && zoomLevel !== MIN_ZOOM_LEVEL
                         ? this.handleZoomOutButtonClick
+                        : undefined
+                    }
+                  />
+                </li>
+              )}
+
+              {enableRotate && (
+                <li className="ril-toolbar__item ril__toolbarItem">
+                  <button // Lightbox zoom in button
+                    type="button"
+                    key="rotate-circle"
+                    aria-label={this.props.rotateLabel}
+                    className={[
+                      'ril-zoom-in',
+                      'ril__toolbarItemChild',
+                      'ril__builtinButton',
+                      'ril__zoomInButton',
+                      ...(zoomLevel === MAX_ZOOM_LEVEL
+                        ? ['ril__builtinButtonDisabled']
+                        : []),
+                    ].join(' ')}
+                    ref={this.rotateBtn}
+                    disabled={
+                      this.isAnimating()
+                    }
+                    onClick={
+                      !this.isAnimating()
+                        ? this.handleRotateButtonClick
                         : undefined
                     }
                   />
@@ -1747,6 +1786,8 @@ ReactImageLightbox.propTypes = {
   // Set to false to disable zoom functionality and hide zoom buttons
   enableZoom: PropTypes.bool,
 
+  enableRotate: PropTypes.bool,
+
   // Override props set on react-modal (https://github.com/reactjs/react-modal)
   reactModalProps: PropTypes.shape({}),
 
@@ -1754,6 +1795,7 @@ ReactImageLightbox.propTypes = {
   nextLabel: PropTypes.string,
   prevLabel: PropTypes.string,
   zoomInLabel: PropTypes.string,
+  rotateLabel: PropTypes.string,
   zoomOutLabel: PropTypes.string,
   closeLabel: PropTypes.string,
 
@@ -1772,6 +1814,7 @@ ReactImageLightbox.defaultProps = {
   closeLabel: 'Close lightbox',
   discourageDownloads: false,
   enableZoom: true,
+  enableRotate: true,
   imagePadding: 10,
   imageCrossOrigin: null,
   keyRepeatKeyupBonus: 40,
@@ -1780,17 +1823,18 @@ ReactImageLightbox.defaultProps = {
   nextLabel: 'Next image',
   nextSrc: null,
   nextSrcThumbnail: null,
-  onAfterOpen: () => {},
-  onImageLoadError: () => {},
-  onImageLoad: () => {},
-  onMoveNextRequest: () => {},
-  onMovePrevRequest: () => {},
+  onAfterOpen: () => { },
+  onImageLoadError: () => { },
+  onImageLoad: () => { },
+  onMoveNextRequest: () => { },
+  onMovePrevRequest: () => { },
   prevLabel: 'Previous image',
   prevSrc: null,
   prevSrcThumbnail: null,
   reactModalStyle: {},
   wrapperClassName: '',
   zoomInLabel: 'Zoom in',
+  rotateLabel: 'Rotate',
   zoomOutLabel: 'Zoom out',
   imageLoadErrorMessage: 'This image failed to load',
 };
